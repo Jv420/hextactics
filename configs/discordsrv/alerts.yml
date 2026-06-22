@@ -1,0 +1,110 @@
+# HexTactics DiscordSRV alerts.yml
+# Plaats/merge dit in plugins/DiscordSRV/alerts.yml
+# Vervang CHANNEL_ID_* met echte Discord channel IDs.
+
+Alerts:
+  ServerStart:
+    Enabled: true
+    Channel: "CHANNEL_ID_ONLINE_STATUS"
+    Trigger: "server_start"
+    Async: true
+    Embed:
+      Enabled: true
+      Color: "#22c55e"
+      Author:
+        ImageUrl: ""
+        Name: "HexTactics Server"
+        Url: "https://hextactics.nl"
+      Title:
+        Text: "🟢 Server gestart"
+        Url: "https://hextactics.nl"
+      Description: "HexTactics is online.\nJava: `play.hextactics.nl`\nBedrock: `bedrock.hextactics.nl:19132`"
+      Fields:
+        - "Spelers;%online%/%maxplayers%;true"
+        - "Versie;Paper 1.21.11;true"
+      Timestamp: true
+
+  ServerStop:
+    Enabled: true
+    Channel: "CHANNEL_ID_ONLINE_STATUS"
+    Trigger: "server_stop"
+    Async: true
+    Embed:
+      Enabled: true
+      Color: "#ef4444"
+      Title:
+        Text: "🔴 Server gestopt"
+      Description: "HexTactics is gestopt of wordt opnieuw gestart."
+      Timestamp: true
+
+  PlayerJoin:
+    Enabled: true
+    Channel: "CHANNEL_ID_JOINS_LEAVES"
+    Trigger: "player_join"
+    Async: true
+    Embed:
+      Enabled: true
+      Color: "#22c55e"
+      Title:
+        Text: "👋 Speler joined"
+      Description: "**%player%** is HexTactics gejoined."
+      Fields:
+        - "Online;%online%/%maxplayers%;true"
+      ThumbnailUrl: "https://mc-heads.net/avatar/%player%/64"
+      Timestamp: true
+
+  PlayerLeave:
+    Enabled: true
+    Channel: "CHANNEL_ID_JOINS_LEAVES"
+    Trigger: "player_quit"
+    Async: true
+    Embed:
+      Enabled: true
+      Color: "#f97316"
+      Title:
+        Text: "🚪 Speler left"
+      Description: "**%player%** heeft HexTactics verlaten."
+      Fields:
+        - "Online;%online%/%maxplayers%;true"
+      ThumbnailUrl: "https://mc-heads.net/avatar/%player%/64"
+      Timestamp: true
+
+  PlayerDeath:
+    Enabled: true
+    Channel: "CHANNEL_ID_PLAYER_STATS"
+    Trigger: "player_death"
+    Async: true
+    Embed:
+      Enabled: true
+      Color: "#991b1b"
+      Title:
+        Text: "💀 Player death"
+      Description: "%deathmessage%"
+      Timestamp: true
+
+  Advancement:
+    Enabled: true
+    Channel: "CHANNEL_ID_PLAYER_STATS"
+    Trigger: "player_advancement_done"
+    Async: true
+    Embed:
+      Enabled: true
+      Color: "#a855f7"
+      Title:
+        Text: "🏆 Advancement"
+      Description: "**%player%** heeft een advancement gehaald."
+      ThumbnailUrl: "https://mc-heads.net/avatar/%player%/64"
+      Timestamp: true
+
+  PlayerCount:
+    Enabled: true
+    Channel: "CHANNEL_ID_ONLINE_STATUS"
+    Trigger: "player_count"
+    Async: true
+    Embed:
+      Enabled: true
+      Color: "#3b82f6"
+      Title:
+        Text: "📊 Online spelers"
+      Description: "Er zijn nu **%online%/%maxplayers%** spelers online op HexTactics."
+      Timestamp: true
