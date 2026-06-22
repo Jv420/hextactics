@@ -1,5 +1,6 @@
 # HexTacticsStore config
 # Deze plugin kan webshop-orders direct in Minecraft uitvoeren zonder RCON worker.
+# Extra: Discord logging voor shop, joins/leaves, deaths, stats en online status.
 
 server:
   port: 4567
@@ -11,10 +12,13 @@ security:
 
 discord:
   enabled: true
-  # Maak hiervoor een webhook in Discord kanaal: shop-orders
+  # Maak webhooks in de juiste Discord kanalen en plak ze hier.
   shop-webhook-url: "CHANGE_THIS_DISCORD_WEBHOOK_URL"
-  # Optioneel aparte webhook voor errors/alerts
   alerts-webhook-url: "CHANGE_THIS_DISCORD_WEBHOOK_URL"
+  joins-webhook-url: "CHANGE_THIS_DISCORD_WEBHOOK_URL"
+  stats-webhook-url: "CHANGE_THIS_DISCORD_WEBHOOK_URL"
+  online-webhook-url: "CHANGE_THIS_DISCORD_WEBHOOK_URL"
+  online-status-interval-minutes: 15
 
 messages:
   prefix: "&5&lHexTactics &8» &7"
