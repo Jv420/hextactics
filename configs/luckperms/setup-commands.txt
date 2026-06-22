@@ -1,0 +1,78 @@
+# HexTactics LuckPerms setup
+# Plak deze commands in de console.
+
+lp creategroup speler
+lp creategroup vip
+lp creategroup elite
+lp creategroup legend
+lp creategroup tactician
+lp creategroup helper
+lp creategroup moderator
+lp creategroup admin
+lp creategroup owner
+
+lp setdefaultgroup speler
+
+# Prefixes
+lp group speler meta setprefix 10 "&7[Speler] "
+lp group vip meta setprefix 20 "&a[VIP] "
+lp group elite meta setprefix 30 "&b[Elite] "
+lp group legend meta setprefix 40 "&6[Legend] "
+lp group tactician meta setprefix 50 "&5[Tactician] "
+lp group helper meta setprefix 60 "&e[Helper] "
+lp group moderator meta setprefix 70 "&9[Mod] "
+lp group admin meta setprefix 80 "&c[Admin] "
+lp group owner meta setprefix 100 "&4[Owner] "
+
+# Inheritance
+lp group vip parent add speler
+lp group elite parent add vip
+lp group legend parent add elite
+lp group tactician parent add legend
+lp group helper parent add speler
+lp group moderator parent add helper
+lp group admin parent add moderator
+
+# Speler permissions
+lp group speler permission set essentials.spawn true
+lp group speler permission set essentials.home true
+lp group speler permission set essentials.sethome true
+lp group speler permission set essentials.delhome true
+lp group speler permission set essentials.tpa true
+lp group speler permission set essentials.tpaccept true
+lp group speler permission set essentials.tpdeny true
+lp group speler permission set essentials.msg true
+lp group speler permission set essentials.reply true
+lp group speler permission set essentials.balance true
+lp group speler permission set essentials.pay true
+lp group speler permission set betterrtp.use true
+lp group speler permission set deluxemenus.open true
+lp group speler permission set hextactics.menu true
+
+# VIP
+lp group vip permission set essentials.sethome.multiple.vip true
+lp group vip permission set essentials.workbench true
+lp group vip permission set essentials.hat true
+lp group vip permission set essentials.feed true
+
+# Elite
+lp group elite permission set essentials.sethome.multiple.elite true
+lp group elite permission set essentials.enderchest true
+lp group elite permission set essentials.back true
+
+# Legend
+lp group legend permission set essentials.sethome.multiple.legend true
+lp group legend permission set essentials.fly true
+lp group legend permission set essentials.nick true
+
+# Tactician
+lp group tactician permission set essentials.sethome.multiple.tactician true
+lp group tactician permission set essentials.repair true
+
+# Staff
+lp group helper permission set essentials.mute true
+lp group moderator permission set essentials.kick true
+lp group moderator permission set essentials.ban true
+lp group admin permission set essentials.* true
+lp group admin permission set worldguard.* true
+lp group owner permission set * true
