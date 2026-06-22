@@ -10,16 +10,42 @@
 <header class="nav"><a class="logo" href="index.html">Hex<span>Tactics</span></a><nav><a href="index.html">Home</a><a href="shop.html">Shop</a><a href="terms.html">Voorwaarden</a><a href="privacy.html">Privacy</a></nav></header>
 <main>
   <h1>HexTactics Shop</h1>
-  <p class="lead">Koop ranks, keys en bundles. Na betaling geeft de RCON-worker automatisch je product in-game.</p>
+  <p class="lead">Vul je Minecraft naam in, kies een product en betaal veilig. Na betaling levert de RCON-worker automatisch je rank, keys of coins.</p>
+
+  <section class="card checkout-box">
+    <label for="playerName">Minecraft gebruikersnaam</label>
+    <input id="playerName" class="input" placeholder="Bijvoorbeeld: Steve" maxlength="16" />
+    <p class="small">Let op: vul je naam exact goed in. Bedrock spelers gebruiken soms een punt of prefix.</p>
+  </section>
+
   <section class="grid">
-    <article class="card product"><h2>VIP Rank</h2><p>30 dagen VIP perks.</p><p class="price">€4,99</p><button class="btn primary">Binnenkort</button></article>
-    <article class="card product"><h2>Elite Rank</h2><p>30 dagen Elite perks.</p><p class="price">€9,99</p><button class="btn primary">Binnenkort</button></article>
-    <article class="card product"><h2>Legend Rank</h2><p>30 dagen Legend perks.</p><p class="price">€14,99</p><button class="btn primary">Binnenkort</button></article>
-    <article class="card product"><h2>Crate Keys</h2><p>3 premium keys.</p><p class="price">€2,99</p><button class="btn primary">Binnenkort</button></article>
-    <article class="card product"><h2>PvP Bundle</h2><p>Gear voor je tactical fights.</p><p class="price">€3,99</p><button class="btn primary">Binnenkort</button></article>
-    <article class="card product"><h2>Coins Pack</h2><p>In-game money pakket.</p><p class="price">€4,99</p><button class="btn primary">Binnenkort</button></article>
+    <article class="card product"><h2>VIP Rank</h2><p>30 dagen VIP perks.</p><p class="price">€4,99</p><button class="btn primary" onclick="startCheckout('vip')">Kopen</button></article>
+    <article class="card product"><h2>Elite Rank</h2><p>30 dagen Elite perks.</p><p class="price">€9,99</p><button class="btn primary" onclick="startCheckout('elite')">Kopen</button></article>
+    <article class="card product"><h2>Legend Rank</h2><p>30 dagen Legend perks.</p><p class="price">€14,99</p><button class="btn primary" onclick="startCheckout('legend')">Kopen</button></article>
+    <article class="card product"><h2>Crate Keys</h2><p>3 premium keys.</p><p class="price">€2,99</p><button class="btn primary" onclick="startCheckout('keys_3')">Kopen</button></article>
+    <article class="card product"><h2>PvP Bundle</h2><p>Gear voor je tactical fights.</p><p class="price">€3,99</p><button class="btn primary" onclick="startCheckout('pvp_bundle')">Kopen</button></article>
+    <article class="card product"><h2>Coins Pack</h2><p>50.000 in-game coins.</p><p class="price">€4,99</p><button class="btn primary" onclick="startCheckout('coins_50k')">Kopen</button></article>
   </section>
 </main>
-<footer><p>© 2026 HexTactics. Betalingen worden later gekoppeld via Stripe.</p></footer>
+<footer><p>© 2026 HexTactics. Betalingen worden gekoppeld via Stripe.</p></footer>
+<script>
+  const CHECKOUT_API_URL = 'https://jouw-worker-url.nl/create-checkout-session';
+
+  async function startCheckout(product) {
+    const player = document.getElementById('playerName').value.trim();
+    if (!player) return alert('Vul eerst je Minecraft gebruikersnaam in.');
+
+    alert('Checkout is voorbereid voor: ' + player + ' | Product: ' + product + '\n\nVervang CHECKOUT_API_URL zodra je worker online staat.');
+
+    // Later activeren zodra de worker online staat:
+    // const response = await fetch(CHECKOUT_API_URL, {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ player, product })
+    // });
+    // const data = await response.json();
+    // window.location.href = data.url;
+  }
+</script>
 </body>
 </html>
