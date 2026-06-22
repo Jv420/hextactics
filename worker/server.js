@@ -42,7 +42,7 @@ const PRODUCTS = {
 };
 
 app.use(cors());
-app.get('/health', (req, res) => res.json({ ok: true, service: 'HexTactics RCON Worker' }));
+app.get('/health', (req, res) => res.json({ ok: true, service: 'HexTactics Worker' }));
 
 async function sendDiscord(message) {
   if (!process.env.DISCORD_WEBHOOK_URL) return;
@@ -65,6 +65,10 @@ function isValidMinecraftName(player) {
   return typeof player === 'string' && /^[a-zA-Z0-9_.]{3,16}$/.test(player);
 }
 
+function formatPrice(cents) {
+  return `€${(cents / 100).toFixed(2)}`;
+}
+
 async function runRconCommands(commands) {
   const rcon = await Rcon.connect({
     host: process.env.RCON_HOST,
@@ -83,6 +87,39 @@ async function runRconCommands(commands) {
   }
 }
 
+async function deliverViaPlugin({ player, product, orderId, price }) {
+  const apiUrl = process.env.PLUGIN_API_URL;
+  const token = process.env.PLUGIN_API_TOKEN;
+
+  if (!apiUrl || !token) throw new Error('PLUGIN_API_URL or PLUGIN_API_TOKEN missing');
+
+  const response = await fetch(`${apiUrl.replace(/\/$/, '')}/deliver`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-HexTactics-Token': token
+    },
+    body: JSON.stringify({ player, product, orderId, price })
+  });
+
+  const text = await response.text();
+  if (!response.ok) throw new Error(`Plugin delivery failed: ${response.status} ${text}`);
+  return text;
+}
+
+async function deliverOrder({ player, product, orderId, price }) {
+  const mode = (process.env.DELIVERY_MODE || 'plugin').toLowerCase();
+
+  if (mode === 'plugin') {
+    return deliverViaPlugin({ player, product, orderId, price });
+  }
+
+  const commandsTemplate = getProductCommands(product);
+  if (!commandsTemplate) throw new Error(`Unknown product: ${product}`);
+  const commands = commandsTemplate.map(cmd => cmd.replaceAll('{player}', player));
+  return runRconCommands(commands);
+}
+
 app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
   if (!stripe) return res.status(500).send('Stripe not configured');
 
@@ -98,20 +135,21 @@ app.post('/stripe/webhook', express.raw({ type: 'application/json' }), async (re
     const session = event.data.object;
     const player = session.metadata?.player;
     const product = session.metadata?.product;
-    const commandsTemplate = getProductCommands(product);
+    const item = PRODUCTS[product];
+    const orderId = session.id || 'unknown';
+    const price = item ? formatPrice(item.priceInCents) : 'unknown';
 
-    if (!player || !commandsTemplate) {
+    if (!player || !item) {
       await sendDiscord(`HexTactics order mist metadata. Product: ${product || 'unknown'}, speler: ${player || 'unknown'}`);
       return res.json({ received: true });
     }
 
-    const commands = commandsTemplate.map(cmd => cmd.replaceAll('{player}', player));
     try {
-      await runRconCommands(commands);
-      await sendDiscord(`HexTactics bestelling geleverd aan ${player} | Product: ${product}`);
+      await deliverOrder({ player, product, orderId, price });
+      await sendDiscord(`✅ HexTactics bestelling geleverd aan ${player} | Product: ${product} | Order: ${orderId}`);
     } catch (error) {
-      console.error('RCON error:', error.message);
-      await sendDiscord(`HexTactics RCON fout voor ${player} | Product: ${product} | ${error.message}`);
+      console.error('Delivery error:', error.message);
+      await sendDiscord(`❌ HexTactics delivery fout voor ${player} | Product: ${product} | ${error.message}`);
     }
   }
 
@@ -157,12 +195,11 @@ app.post('/create-checkout-session', async (req, res) => {
 
 app.post('/test-delivery', async (req, res) => {
   const { player, product } = req.body;
-  const commandsTemplate = getProductCommands(product);
-  if (!isValidMinecraftName(player) || !commandsTemplate) return res.status(400).json({ error: 'Gebruik: { player, product }' });
-  const commands = commandsTemplate.map(cmd => cmd.replaceAll('{player}', player));
-  const results = await runRconCommands(commands);
-  res.json({ ok: true, commands, results });
+  const item = PRODUCTS[product];
+  if (!isValidMinecraftName(player) || !item) return res.status(400).json({ error: 'Gebruik: { player, product }' });
+  const result = await deliverOrder({ player, product, orderId: 'manual-test', price: formatPrice(item.priceInCents) });
+  res.json({ ok: true, result });
 });
 
 const port = Number(process.env.PORT || 4000);
-app.listen(port, () => console.log(`HexTactics RCON Worker draait op poort ${port}`));
+app.listen(port, () => console.log(`HexTactics Worker draait op poort ${port}`));
