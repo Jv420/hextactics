@@ -1,0 +1,35 @@
+# HexTactics TAB starter config
+# Let op: TAB config verschilt per versie. Gebruik dit als basis/voorbeeld.
+
+header-footer:
+  enabled: true
+  header:
+    - '&5&lHexTactics'
+    - '&7Tactical Survival &8| &bJava + Bedrock'
+    - ''
+  footer:
+    - ''
+    - '&7Website: &dhextactics.nl'
+    - '&7Shop: &6shop.hextactics.nl'
+    - '&7Discord: &9discord.hextactics.nl'
+
+scoreboard-teams:
+  enabled: true
+  enable-collision: true
+  invisible-nametags: false
+  sorting-types:
+    - GROUPS:owner,admin,moderator,helper,tactician,legend,elite,vip,speler
+    - PLACEHOLDER_A_TO_Z:%player%
+
+belowname-objective:
+  enabled: true
+  number: '%health%'
+  text: '&c❤'
+
+playerlist-name-formatting:
+  enabled: true
+  format: '%luckperms_prefix%%player%'
+
+placeholder-output-replacements:
+  '%luckperms_prefix%':
+    'null': '&7[Speler] '
