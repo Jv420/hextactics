@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HexTactics - Tactical Minecraft Survival</title>
+  <meta name="description" content="HexTactics is een tactical Minecraft survival server met PvP, clans, economy, crates en Java + Bedrock crossplay." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="nav">
+    <a class="logo" href="index.html">Hex<span>Tactics</span></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="terms.html">Voorwaarden</a>
+      <a href="privacy.html">Privacy</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="badge">Java + Bedrock Crossplay</p>
+        <h1>Welkom bij HexTactics</h1>
+        <p class="lead">Een tactical survival server met PvP, clans, economy, crates, raids en een sterke community.</p>
+        <div class="actions">
+          <a class="btn primary" href="shop.html">Bekijk shop</a>
+          <button class="btn" onclick="copyIP()">Kopieer IP</button>
+        </div>
+        <p class="ip">Server IP: <strong>play.hextactics.nl</strong></p>
+      </div>
+      <div class="card server-card">
+        <h2>Server info</h2>
+        <ul>
+          <li>⚔ Tactical Survival</li>
+          <li>💰 Economy & shops</li>
+          <li>🎁 Crates & rewards</li>
+          <li>🛡 Clans & PvP</li>
+          <li>📱 Java + Bedrock</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card"><h3>Survive</h3><p>Bouw je base, verzamel resources en bescherm je team.</p></article>
+      <article class="card"><h3>Dominate</h3><p>Maak tactische alliances, win PvP fights en klim op de leaderboards.</p></article>
+      <article class="card"><h3>Earn</h3><p>Verdien money met shops, trading, crates en events.</p></article>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 HexTactics. Niet verbonden aan Mojang, Microsoft of Minecraft.</p>
+  </footer>
+
+  <script>
+    function copyIP() {
+      navigator.clipboard.writeText('play.hextactics.nl');
+      alert('Server IP gekopieerd: play.hextactics.nl');
+    }
+  </script>
+</body>
+</html>
