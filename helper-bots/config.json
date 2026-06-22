@@ -1,0 +1,26 @@
+{
+  "server": {
+    "host": "play.hextactics.nl",
+    "port": 25565,
+    "version": "1.21.1",
+    "auth": "offline"
+  },
+  "ownerUsername": "JouwMinecraftNaam",
+  "bots": [
+    { "name": "HexCommander", "role": "commander" },
+    { "name": "HexBuilder", "role": "builder" },
+    { "name": "HexFarmer", "role": "farmer" }
+  ],
+  "safety": {
+    "maxBots": 3,
+    "commandCooldownSeconds": 5,
+    "autoReconnect": true,
+    "reconnectDelaySeconds": 20,
+    "allowOnlyOwnerCommands": true
+  },
+  "locations": {
+    "spawn": { "x": 0, "y": 64, "z": 0 },
+    "farm": { "x": 20, "y": 64, "z": 20 },
+    "build": { "x": 30, "y": 64, "z": 30 }
+  }
+}
