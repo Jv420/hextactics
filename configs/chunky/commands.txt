@@ -1,0 +1,19 @@
+# HexTactics Chunky setup
+# Gebruik in console nadat Chunky is geïnstalleerd.
+
+# Stel worldborder in, bijvoorbeeld 10000 blocks radius.
+worldborder center 0 0
+worldborder set 20000
+
+# Chunky world pregeneration
+chunky world world
+chunky center 0 0
+chunky radius 10000
+chunky shape square
+chunky start
+
+# Status bekijken
+chunky progress
+
+# Stoppen als nodig
+chunky cancel
