@@ -1,0 +1,45 @@
+# HexTactics EssentialsX starter config
+# Kopieer belangrijke stukken naar plugins/Essentials/config.yml
+
+ops-name-color: '4'
+nickname-prefix: '~'
+change-displayname: true
+add-prefix-suffix: true
+teleport-safety: true
+teleport-cooldown: 5
+teleport-delay: 3
+teleport-invulnerability: 3
+heal-cooldown: 60
+near-radius: 200
+permission-based-item-spawn: false
+spawnmob-limit: 10
+warn-on-smite: true
+
+# Economy
+economy-log-enabled: true
+starting-balance: 1000
+currency-symbol: '$'
+max-money: 1000000000
+min-money: 0
+
+# Homes
+sethome-multiple:
+  default: 2
+  vip: 4
+  elite: 6
+  legend: 8
+  tactician: 10
+
+tpa-accept-cancellation: 120
+teleport-request-timeout: 120
+
+# Commands uitschakelen als je andere plugins gebruikt
+disabled-commands:
+  - sell
+
+# Join/Quit messages
+custom-join-message: '&8[&a+&8] &7{USERNAME} &fjoined &5HexTactics&f!'
+custom-quit-message: '&8[&c-&8] &7{USERNAME} &fleft HexTactics.'
+
+# Spawn on join
+spawn-on-join: false
