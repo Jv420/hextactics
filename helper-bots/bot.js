@@ -5,6 +5,7 @@ const mineflayer = require('mineflayer');
 const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
 const { GoalNear, GoalFollow, GoalBlock } = goals;
 const axios = require('axios');
+const { status } = require('minecraft-server-util');
 
 const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 const bots = new Map();
@@ -19,7 +20,9 @@ const settings = {
   discordWebhook: process.env.DISCORD_WEBHOOK_URL || '',
   cooldownSeconds: Number(process.env.COMMAND_COOLDOWN_SECONDS || config.safety.commandCooldownSeconds || 5),
   autoReconnect: String(process.env.AUTO_RECONNECT || config.safety.autoReconnect) === 'true',
-  reconnectDelaySeconds: Number(process.env.RECONNECT_DELAY_SECONDS || config.safety.reconnectDelaySeconds || 20)
+  reconnectDelaySeconds: Number(process.env.RECONNECT_DELAY_SECONDS || config.safety.reconnectDelaySeconds || 20),
+  pingBotUrl: process.env.PING_BOT_URL || '',
+  pingBotToken: process.env.PING_BOT_TOKEN || ''
 };
 
 function log(message) {
@@ -28,6 +31,35 @@ function log(message) {
   if (settings.discordWebhook) {
     axios.post(settings.discordWebhook, { content: line }).catch(() => {});
   }
+}
+
+async function checkMinecraftStatus() {
+  const result = await status(settings.host, settings.port, { timeout: 5000 });
+  return {
+    online: true,
+    host: settings.host,
+    port: settings.port,
+    playersOnline: result.players.online,
+    maxPlayers: result.players.max,
+    latency: result.roundTripLatency,
+    version: result.version.name,
+    motd: result.motd.clean
+  };
+}
+
+async function checkPingBotHealth() {
+  if (!settings.pingBotUrl) return null;
+  const url = `${settings.pingBotUrl.replace(/\/$/, '')}/health`;
+  const response = await axios.get(url, { timeout: 5000 });
+  return response.data;
+}
+
+async function checkPingBotStatus() {
+  if (!settings.pingBotUrl) return null;
+  const base = settings.pingBotUrl.replace(/\/$/, '');
+  const tokenQuery = settings.pingBotToken ? `?token=${encodeURIComponent(settings.pingBotToken)}` : '';
+  const response = await axios.get(`${base}/status${tokenQuery}`, { timeout: 5000 });
+  return response.data;
 }
 
 function createBot(botConfig) {
@@ -58,7 +90,10 @@ function createBot(botConfig) {
       return;
     }
 
-    handleCommand(bot, username, message.trim());
+    handleCommand(bot, username, message.trim()).catch(error => {
+      bot.chat(`Command fout: ${error.message}`);
+      log(`Command fout bij ${message}: ${error.message}`);
+    });
   });
 
   bot.on('kicked', reason => log(`${bot.username} kicked: ${reason}`));
@@ -86,12 +121,12 @@ function getWorkers() {
   return [...bots.values()].filter(bot => bot.role !== 'commander');
 }
 
-function handleCommand(bot, username, message) {
+async function handleCommand(bot, username, message) {
   const args = message.split(' ');
   const cmd = args[0].toLowerCase();
 
   if (cmd === '!help') {
-    bot.chat('Commands: !status, !follow, !stop, !come, !goto spawn|farm|build, !builder test, !farm test');
+    bot.chat('Commands: !status, !ping, !server, !health, !follow, !stop, !come, !goto spawn|farm|build, !builder test, !farm test');
     return;
   }
 
@@ -99,6 +134,39 @@ function handleCommand(bot, username, message) {
     const online = [...bots.values()].map(b => `${b.username}:${b.role}`).join(', ');
     bot.chat(`Helpers online: ${online}`);
     log(`Status gevraagd door ${username}: ${online}`);
+    return;
+  }
+
+  if (cmd === '!ping' || cmd === '!server') {
+    try {
+      const mc = await checkMinecraftStatus();
+      const msg = `Server online: ${mc.playersOnline}/${mc.maxPlayers} spelers | ping ${mc.latency}ms | ${mc.version}`;
+      bot.chat(msg);
+      log(msg);
+    } catch (error) {
+      bot.chat(`Server ping fout: ${error.message}`);
+      log(`Server ping fout: ${error.message}`);
+    }
+    return;
+  }
+
+  if (cmd === '!health') {
+    try {
+      const health = await checkPingBotHealth();
+      if (!health) {
+        bot.chat('PING_BOT_URL is niet ingesteld. Gebruik !ping voor directe Minecraft status.');
+        return;
+      }
+      bot.chat(`Ping-bot health: ${health.ok ? 'OK' : 'NIET OK'} | ${health.service || 'unknown'}`);
+      const fullStatus = await checkPingBotStatus().catch(() => null);
+      if (fullStatus?.minecraft) {
+        const mc = fullStatus.minecraft;
+        bot.chat(`Ping-bot Minecraft: ${mc.online ? 'online' : 'offline'} | ${mc.playersOnline || 0}/${mc.maxPlayers || 0}`);
+      }
+    } catch (error) {
+      bot.chat(`Health fout: ${error.message}`);
+      log(`Health fout: ${error.message}`);
+    }
     return;
   }
 
