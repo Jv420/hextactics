@@ -1,0 +1,47 @@
+# HexTacticsStore config
+# Plaats in plugins/HexTacticsStore/config.yml
+
+server:
+  port: 4567
+  bind: "0.0.0.0"
+
+security:
+  # Verander dit naar een lange geheime token.
+  # Zet deze token ook in je worker environment als PLUGIN_API_TOKEN.
+  api-token: "CHANGE_THIS_LONG_SECRET_TOKEN"
+
+messages:
+  prefix: "&5&lHexTactics &8» &7"
+  delivered: "&aJe aankoop is geleverd: &e{product}"
+  no-permission: "&cJe hebt geen permissie."
+
+products:
+  vip:
+    display-name: "VIP Rank - 30 dagen"
+    commands:
+      - "lp user {player} parent settemp vip 30d"
+      - "broadcast &a{player} heeft VIP gekocht op HexTactics!"
+  elite:
+    display-name: "Elite Rank - 30 dagen"
+    commands:
+      - "lp user {player} parent settemp elite 30d"
+      - "broadcast &b{player} heeft Elite gekocht op HexTactics!"
+  legend:
+    display-name: "Legend Rank - 30 dagen"
+    commands:
+      - "lp user {player} parent settemp legend 30d"
+      - "broadcast &6{player} heeft Legend gekocht op HexTactics!"
+  keys_3:
+    display-name: "3 Premium Crate Keys"
+    commands:
+      - "crate key give {player} premium 3"
+  pvp_bundle:
+    display-name: "PvP Bundle"
+    commands:
+      - "give {player} diamond_sword 1"
+      - "give {player} shield 1"
+      - "give {player} golden_apple 8"
+  coins_50k:
+    display-name: "50.000 Coins"
+    commands:
+      - "eco give {player} 50000"
