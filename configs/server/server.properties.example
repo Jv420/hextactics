@@ -1,0 +1,33 @@
+# HexTactics Paper 1.21.11 server.properties voorbeeld
+# Kopieer naar server.properties en pas secrets aan.
+
+server-name=HexTactics
+motd=HexTactics - Tactical Survival
+server-port=25565
+online-mode=true
+
+# Performance
+view-distance=8
+simulation-distance=6
+max-players=50
+spawn-protection=0
+
+# RCON optioneel. Niet verplicht als je HexTacticsStore plugin gebruikt.
+enable-rcon=true
+rcon.port=25575
+rcon.password=CHANGE_THIS_STRONG_PASSWORD
+
+# Query optioneel voor status websites
+enable-query=true
+query.port=25565
+
+# Veilig
+white-list=false
+enforce-secure-profile=false
+allow-flight=false
+
+# World
+gamemode=survival
+difficulty=normal
+hardcore=false
+pvp=true
