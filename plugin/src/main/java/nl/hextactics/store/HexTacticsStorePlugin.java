@@ -35,14 +35,16 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         loadSettings();
+        getServer().getPluginManager().registerEvents(new HexTacticsStatsListener(this), this);
         startHttpServer();
+        startOnlineStatusTask();
         getLogger().info("HexTacticsStore is ingeschakeld.");
-        sendDiscordAlert("🟢 HexTacticsStore gestart", "De webshop delivery plugin is online.");
+        sendDiscordAlert("🟢 HexTactics server gestart", "HexTacticsStore is online en Discord logging staat klaar.");
     }
 
     @Override
     public void onDisable() {
-        sendDiscordAlert("🔴 HexTacticsStore gestopt", "De webshop delivery plugin is gestopt of server restart.");
+        sendDiscordAlert("🔴 HexTactics server gestopt", "Server/plugin is gestopt of wordt opnieuw gestart.");
         if (server != null) {
             server.stop(0);
             server = null;
@@ -151,6 +153,7 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
         if (args.length == 0) {
             sender.sendMessage(prefix + "Gebruik: /" + label + " reload");
             sender.sendMessage(prefix + "Gebruik: /" + label + " deliver <speler> <product>");
+            sender.sendMessage(prefix + "Gebruik: /" + label + " status");
             return true;
         }
 
@@ -160,6 +163,12 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
             startHttpServer();
             sender.sendMessage(prefix + "Config herladen en HTTP API opnieuw gestart.");
             sendDiscordAlert("🔄 HexTacticsStore reload", "Config is herladen door " + sender.getName() + ".");
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("status")) {
+            sendOnlineStatus();
+            sender.sendMessage(prefix + "Online status naar Discord gestuurd.");
             return true;
         }
 
@@ -203,19 +212,71 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
     }
 
     private void sendDiscordAlert(String title, String description) {
+        sendPublicDiscordEmbed("discord.alerts-webhook-url", title, description, 16753920, null);
+    }
+
+    public void sendPublicDiscordEmbed(String webhookPath, String title, String description, int color, String playerName) {
         if (!getConfig().getBoolean("discord.enabled", true)) return;
-        String webhook = getConfig().getString("discord.alerts-webhook-url", "");
+        String webhook = getConfig().getString(webhookPath, "");
         if (!isWebhookConfigured(webhook)) return;
 
+        String thumbnail = playerName == null || playerName.isBlank()
+                ? ""
+                : ",\"thumbnail\":{\"url\":\"https://mc-heads.net/avatar/" + escapeJson(playerName) + "/64\"}";
+
         String json = "{"
-                + "\"username\":\"HexTactics Alerts\","
+                + "\"username\":\"HexTactics Logs\","
                 + "\"embeds\":[{"
                 + "\"title\":\"" + escapeJson(title) + "\","
                 + "\"description\":\"" + escapeJson(description) + "\","
-                + "\"color\":16753920,"
+                + "\"color\":" + color + ","
+                + "\"fields\":[{\"name\":\"Online\",\"value\":\"`" + Bukkit.getOnlinePlayers().size() + "/" + Bukkit.getMaxPlayers() + "`\",\"inline\":true}],"
+                + "\"timestamp\":\"" + Instant.now() + "\""
+                + thumbnail
+                + "}]}";
+        postWebhookAsync(webhook, json);
+    }
+
+    private void startOnlineStatusTask() {
+        long minutes = getConfig().getLong("discord.online-status-interval-minutes", 15L);
+        if (minutes <= 0) return;
+        long ticks = minutes * 60L * 20L;
+        Bukkit.getScheduler().runTaskTimer(this, this::sendOnlineStatus, 20L * 30L, ticks);
+    }
+
+    public void scheduleOnlineStatusUpdate() {
+        Bukkit.getScheduler().runTaskLater(this, this::sendOnlineStatus, 20L * 5L);
+    }
+
+    private void sendOnlineStatus() {
+        if (!getConfig().getBoolean("discord.enabled", true)) return;
+        String webhook = getConfig().getString("discord.online-webhook-url", "");
+        if (!isWebhookConfigured(webhook)) return;
+
+        String onlinePlayers = HexTacticsStatsListener.onlinePlayersText();
+        String json = "{"
+                + "\"username\":\"HexTactics Status\","
+                + "\"embeds\":[{"
+                + "\"title\":\"📊 HexTactics online status\","
+                + "\"description\":\"Java: `play.hextactics.nl`\\nBedrock: `bedrock.hextactics.nl:19132`\","
+                + "\"color\":3447003,"
+                + "\"fields\":["
+                + "{\"name\":\"Online\",\"value\":\"`" + Bukkit.getOnlinePlayers().size() + "/" + Bukkit.getMaxPlayers() + "`\",\"inline\":true},"
+                + "{\"name\":\"TPS\",\"value\":\"`" + formatTps() + "`\",\"inline\":true},"
+                + "{\"name\":\"Spelers\",\"value\":\"" + escapeJson(onlinePlayers) + "\",\"inline\":false}"
+                + "],"
                 + "\"timestamp\":\"" + Instant.now() + "\""
                 + "}]}";
         postWebhookAsync(webhook, json);
+    }
+
+    private String formatTps() {
+        try {
+            double tps = Bukkit.getTPS()[0];
+            return String.format(Locale.US, "%.2f", tps);
+        } catch (Throwable ignored) {
+            return "unknown";
+        }
     }
 
     private void postWebhookAsync(String webhook, String json) {
