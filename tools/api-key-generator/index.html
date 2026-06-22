@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HexTactics API Key Generator</title>
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #08050d; color: #f5ecff; font-family: Arial, sans-serif; }
+    .card { width: min(760px, 92vw); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 24px; padding: 28px; }
+    h1 { margin-top: 0; }
+    input, button, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,.16); background: rgba(0,0,0,.25); color: white; font-size: 16px; margin: 8px 0 16px; }
+    button { cursor: pointer; font-weight: 800; background: linear-gradient(135deg, #a855f7, #ef4444); border: 0; }
+    textarea { min-height: 150px; font-family: monospace; }
+    .small { color: #c9b8d9; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>HexTactics API Key Generator</h1>
+    <p class="small">Deze generator draait lokaal in je browser met crypto.getRandomValues. Zet gegenereerde keys nooit in GitHub.</p>
+
+    <label>Prefix</label>
+    <input id="prefix" value="ht_live" />
+
+    <label>Lengte</label>
+    <input id="length" type="number" value="64" min="32" max="128" />
+
+    <button onclick="generate()">Genereer API key</button>
+    <textarea id="output" readonly placeholder="Je key komt hier..."></textarea>
+    <button onclick="copyKey()">Kopieer key</button>
+
+    <p class="small">Gebruik dezelfde key in <code>plugins/HexTacticsStore/config.yml</code> en <code>worker/.env</code>.</p>
+  </main>
+
+  <script>
+    function randomBase64Url(length) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-';
+      const bytes = new Uint8Array(length);
+      crypto.getRandomValues(bytes);
+      let result = '';
+      for (const byte of bytes) result += chars[byte % chars.length];
+      return result;
+    }
+
+    function generate() {
+      const prefix = document.getElementById('prefix').value.trim() || 'ht_live';
+      const length = Math.max(32, Math.min(128, Number(document.getElementById('length').value || 64)));
+      const key = `${prefix}_${randomBase64Url(length)}`;
+      document.getElementById('output').value = key;
+    }
+
+    async function copyKey() {
+      const key = document.getElementById('output').value;
+      if (!key) return alert('Genereer eerst een key.');
+      await navigator.clipboard.writeText(key);
+      alert('API key gekopieerd. Bewaar hem veilig.');
+    }
+  </script>
+</body>
+</html>
