@@ -1,0 +1,1 @@
+{"name":"hextactics-ping-bot","version":"1.0.0","description":"Safe health endpoint and monitor helper for HexTactics services","main":"server.js","scripts":{"start":"node server.js","dev":"node --watch server.js"},"dependencies":{"axios":"latest","cors":"latest","dotenv":"latest","express":"latest","minecraft-server-util":"latest"},"license":"MIT"}
