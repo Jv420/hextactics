@@ -1,0 +1,50 @@
+menu_title: '&5&lHexTactics &8| &cRules'
+open_command:
+  - rules
+  - regels
+size: 27
+
+items:
+  filler:
+    material: RED_STAINED_GLASS_PANE
+    display_name: ' '
+    slots:
+      - 0-26
+  rule1:
+    material: PAPER
+    slot: 10
+    display_name: '&c&l1. Geen server exploits'
+    lore:
+      - '&7Dupes, crash bugs en lag machines zijn verboden.'
+  rule2:
+    material: IRON_SWORD
+    slot: 11
+    display_name: '&6&l2. PvP is toegestaan'
+    lore:
+      - '&7HexTactics is tactical survival.'
+      - '&7Wees slim, bouw veilig en werk samen.'
+  rule3:
+    material: CHEST
+    slot: 12
+    display_name: '&e&l3. Raiden volgens serverregels'
+    lore:
+      - '&7Raiden mag alleen binnen de regels.'
+      - '&7Gebruik geen bugs of illegale items.'
+  rule4:
+    material: OAK_SIGN
+    slot: 13
+    display_name: '&a&l4. Respect in chat'
+    lore:
+      - '&7Geen haat, spam of bedreigingen.'
+  rule5:
+    material: DIAMOND
+    slot: 14
+    display_name: '&b&l5. Shop aankopen'
+    lore:
+      - '&7Vul je Minecraft naam altijd correct in.'
+  back:
+    material: ARROW
+    slot: 22
+    display_name: '&7Terug'
+    left_click_commands:
+      - '[openguimenu] main_menu'
