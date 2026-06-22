@@ -1,0 +1,45 @@
+menu_title: '&5&lHexTactics &8| &6Ranks'
+open_command:
+  - ranks
+  - rank
+size: 27
+
+items:
+  filler:
+    material: PURPLE_STAINED_GLASS_PANE
+    display_name: ' '
+    slots:
+      - 0-26
+  vip:
+    material: EMERALD
+    slot: 11
+    display_name: '&a&lVIP'
+    lore:
+      - '&7Extra homes'
+      - '&7Workbench command'
+      - '&7Feed command'
+      - '&eShop: shop.hextactics.nl'
+  elite:
+    material: DIAMOND
+    slot: 13
+    display_name: '&b&lElite'
+    lore:
+      - '&7Alle VIP perks'
+      - '&7Enderchest command'
+      - '&7Back command'
+      - '&eShop: shop.hextactics.nl'
+  legend:
+    material: NETHER_STAR
+    slot: 15
+    display_name: '&6&lLegend'
+    lore:
+      - '&7Alle Elite perks'
+      - '&7Fly command'
+      - '&7Nick command'
+      - '&eShop: shop.hextactics.nl'
+  back:
+    material: ARROW
+    slot: 22
+    display_name: '&7Terug'
+    left_click_commands:
+      - '[openguimenu] main_menu'
