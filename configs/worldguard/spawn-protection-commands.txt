@@ -1,0 +1,21 @@
+# HexTactics WorldGuard spawn protectie
+# Selecteer eerst je spawn met WorldEdit wand: //wand
+# Linkerklik hoek 1, rechterklik hoek 2.
+
+rg define spawn
+rg flag spawn build deny
+rg flag spawn pvp deny
+rg flag spawn mob-spawning deny
+rg flag spawn creeper-explosion deny
+rg flag spawn enderman-grief deny
+rg flag spawn tnt deny
+rg flag spawn lava-fire deny
+rg flag spawn fire-spread deny
+rg flag spawn chest-access allow
+rg flag spawn interact allow
+rg flag spawn use allow
+rg priority spawn 100
+
+# Spawn greeting
+rg flag spawn greeting &5&lHexTactics &8» &7Welkom bij de spawn!
+rg flag spawn farewell &5&lHexTactics &8» &7Je verlaat de spawn. Succes!
