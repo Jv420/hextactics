@@ -1,0 +1,13 @@
+# HexTactics DeluxeMenus config
+# Plaats in plugins/DeluxeMenus/config.yml
+
+check_updates: true
+debug: false
+
+menus_list:
+  main_menu:
+    file: main_menu.yml
+  rules_menu:
+    file: rules_menu.yml
+  ranks_menu:
+    file: ranks_menu.yml
