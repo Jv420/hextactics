@@ -17,6 +17,25 @@ Laat beschikbare commands zien.
 Laat zien welke bots online zijn.
 
 ```txt
+!ping
+!server
+```
+
+CommanderBot checkt direct de Minecraft serverstatus:
+
+```txt
+online spelers / max spelers
+latency/ping
+server versie
+```
+
+```txt
+!health
+```
+
+CommanderBot checkt de aparte `ping-bot` service als `PING_BOT_URL` is ingesteld.
+
+```txt
 !stop
 ```
 
@@ -57,6 +76,21 @@ Builder bot voert een veilige testactie uit.
 ```
 
 Farmer bot loopt naar farm locatie en meldt dat farm-test gestart is.
+
+## Ping-bot koppeling
+
+Zet in `.env`:
+
+```txt
+PING_BOT_URL=https://jouw-ping-bot-url.nl
+PING_BOT_TOKEN=change_this_optional_token
+```
+
+Daarna kun je gebruiken:
+
+```txt
+!health
+```
 
 ## Veiligheidsregels
 
