@@ -1,0 +1,1 @@
+{"name":"hextactics-safe-helper-bots","version":"1.0.0","description":"Small helper bot setup for your own HexTactics Minecraft server","main":"bot.js","scripts":{"start":"node bot.js"},"dependencies":{"axios":"latest","dotenv":"latest","mineflayer":"latest","mineflayer-pathfinder":"latest","vec3":"latest"},"license":"MIT"}
