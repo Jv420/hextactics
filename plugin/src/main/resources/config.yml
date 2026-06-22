@@ -1,0 +1,42 @@
+# HexTacticsStore config
+# Deze plugin kan webshop-orders direct in Minecraft uitvoeren zonder RCON worker.
+
+server:
+  port: 4567
+  bind: "0.0.0.0"
+
+security:
+  # Verander dit naar een lange geheime token.
+  api-token: "change-this-secret-token"
+
+messages:
+  prefix: "&5&lHexTactics &8» &7"
+  delivered: "&aJe aankoop is geleverd: &e{product}"
+  no-permission: "&cJe hebt geen permissie."
+
+products:
+  vip:
+    display-name: "VIP Rank - 30 dagen"
+    commands:
+      - "lp user {player} parent settemp vip 30d"
+  elite:
+    display-name: "Elite Rank - 30 dagen"
+    commands:
+      - "lp user {player} parent settemp elite 30d"
+  legend:
+    display-name: "Legend Rank - 30 dagen"
+    commands:
+      - "lp user {player} parent settemp legend 30d"
+  keys_3:
+    display-name: "3 Premium Crate Keys"
+    commands:
+      - "crate key give {player} premium 3"
+  pvp_bundle:
+    display-name: "PvP Bundle"
+    commands:
+      - "give {player} diamond_sword 1"
+      - "give {player} golden_apple 8"
+  coins_50k:
+    display-name: "50.000 Coins"
+    commands:
+      - "eco give {player} 50000"
