@@ -1,0 +1,34 @@
+# HexTactics LuckPerms basis
+# Plak deze commands in console.
+
+lp creategroup speler
+lp creategroup vip
+lp creategroup elite
+lp creategroup legend
+lp creategroup tactician
+lp creategroup admin
+lp creategroup owner
+
+lp setdefaultgroup speler
+
+lp group speler permission set essentials.spawn true
+lp group speler permission set essentials.balance true
+lp group speler permission set essentials.pay true
+lp group speler permission set essentials.msg true
+lp group speler permission set betterrtp.use true
+
+lp group vip parent add speler
+lp group vip permission set essentials.workbench true
+lp group vip permission set essentials.feed true
+
+lp group elite parent add vip
+lp group elite permission set essentials.enderchest true
+lp group elite permission set essentials.back true
+
+lp group legend parent add elite
+lp group legend permission set essentials.fly true
+
+lp group admin parent add legend
+lp group admin permission set essentials.* true
+
+lp group owner permission set * true
