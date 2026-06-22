@@ -1,0 +1,14 @@
+name: HexTacticsStore
+version: '1.0.0'
+main: nl.hextactics.store.HexTacticsStorePlugin
+api-version: '1.21'
+author: Jv420
+description: Webshop delivery plugin for HexTactics
+commands:
+  hextacticsstore:
+    description: HexTactics Store command
+    usage: /hextacticsstore reload
+permissions:
+  hextacticsstore.admin:
+    description: Allows admin commands
+    default: op
