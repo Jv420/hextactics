@@ -1,0 +1,1 @@
+{"name":"hextactics-api-key-generator","version":"1.0.0","description":"Secure API key generator for HexTactics tokens","main":"generate.js","type":"commonjs","scripts":{"start":"node generate.js","generate":"node generate.js","generate:long":"node generate.js --length 64 --prefix ht_live"},"license":"MIT"}
