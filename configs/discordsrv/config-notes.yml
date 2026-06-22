@@ -1,0 +1,21 @@
+# HexTactics DiscordSRV notes
+# Gebruik dit als checklist voor plugins/DiscordSRV/config.yml
+
+# Vul je eigen Discord bot token in op je server, nooit in GitHub.
+BotToken: "CHANGE_THIS_IN_REAL_CONFIG"
+
+# Voorbeeld kanalen. Vervang met echte Discord channel IDs.
+Channels:
+  global: "000000000000000000"
+
+DiscordConsoleChannelId: "000000000000000000"
+DiscordChatChannelDiscordToMinecraft: true
+DiscordChatChannelMinecraftToDiscord: true
+DiscordChatChannelRequireLinkedAccount: false
+
+MinecraftChatToDiscordMessageFormat: "**%primarygroup%** %displayname%: %message%"
+DiscordToMinecraftChatMessageFormat: "&9Discord &8» &f%name%&7: &f%message%"
+
+# Aanrader:
+# Maak kanalen: minecraft-chat, server-logs, shop-orders, staff-logs
+# Gebruik HexTacticsStore/worker webhook voor shop-orders.
