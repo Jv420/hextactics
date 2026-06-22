@@ -9,6 +9,13 @@ security:
   # Verander dit naar een lange geheime token.
   api-token: "change-this-secret-token"
 
+discord:
+  enabled: true
+  # Maak hiervoor een webhook in Discord kanaal: shop-orders
+  shop-webhook-url: "CHANGE_THIS_DISCORD_WEBHOOK_URL"
+  # Optioneel aparte webhook voor errors/alerts
+  alerts-webhook-url: "CHANGE_THIS_DISCORD_WEBHOOK_URL"
+
 messages:
   prefix: "&5&lHexTactics &8» &7"
   delivered: "&aJe aankoop is geleverd: &e{product}"
