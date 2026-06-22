@@ -33,6 +33,13 @@ function log(message) {
   }
 }
 
+function explainConnectionError(error) {
+  if (error.code === 'ETIMEDOUT') return 'Timeout: host/poort reageert niet. Check IP, poort, firewall, server online en DNS.';
+  if (error.code === 'ECONNREFUSED') return 'Connection refused: IP is bereikbaar, maar Minecraft luistert niet op deze poort.';
+  if (error.code === 'ENOTFOUND') return 'DNS fout: domein bestaat niet of wijst niet goed door.';
+  return error.message;
+}
+
 async function checkMinecraftStatus() {
   const result = await status(settings.host, settings.port, { timeout: 5000 });
   return {
@@ -63,21 +70,23 @@ async function checkPingBotStatus() {
 }
 
 function createBot(botConfig) {
+  const botName = botConfig.name;
   const bot = mineflayer.createBot({
     host: settings.host,
     port: settings.port,
-    username: botConfig.name,
+    username: botName,
     version: settings.version,
     auth: settings.auth
   });
 
   bot.role = botConfig.role;
+  bot.displayName = botName;
   bot.loadPlugin(pathfinder);
 
   bot.once('spawn', () => {
     const mcData = require('minecraft-data')(bot.version);
     bot.pathfinder.setMovements(new Movements(bot, mcData));
-    log(`${bot.username} joined als ${bot.role}`);
+    log(`${botName} joined als ${bot.role} op ${settings.host}:${settings.port}`);
   });
 
   bot.on('chat', (username, message) => {
@@ -96,17 +105,18 @@ function createBot(botConfig) {
     });
   });
 
-  bot.on('kicked', reason => log(`${bot.username} kicked: ${reason}`));
-  bot.on('error', error => log(`${bot.username} error: ${error.message}`));
+  bot.on('kicked', reason => log(`${botName} kicked: ${reason}`));
+  bot.on('error', error => log(`${botName} error: ${error.code || 'ERROR'} - ${explainConnectionError(error)}`));
   bot.on('end', () => {
-    log(`${bot.username} disconnected.`);
-    bots.delete(bot.username);
+    log(`${botName} disconnected.`);
+    bots.delete(botName);
     if (settings.autoReconnect) {
+      log(`${botName} reconnect over ${settings.reconnectDelaySeconds}s naar ${settings.host}:${settings.port}`);
       setTimeout(() => createBot(botConfig), settings.reconnectDelaySeconds * 1000);
     }
   });
 
-  bots.set(botConfig.name, bot);
+  bots.set(botName, bot);
 }
 
 function canRunCommand(username) {
@@ -131,7 +141,7 @@ async function handleCommand(bot, username, message) {
   }
 
   if (cmd === '!status') {
-    const online = [...bots.values()].map(b => `${b.username}:${b.role}`).join(', ');
+    const online = [...bots.values()].map(b => `${b.displayName || b.username}:${b.role}`).join(', ');
     bot.chat(`Helpers online: ${online}`);
     log(`Status gevraagd door ${username}: ${online}`);
     return;
@@ -144,8 +154,8 @@ async function handleCommand(bot, username, message) {
       bot.chat(msg);
       log(msg);
     } catch (error) {
-      bot.chat(`Server ping fout: ${error.message}`);
-      log(`Server ping fout: ${error.message}`);
+      bot.chat(`Server ping fout: ${explainConnectionError(error)}`);
+      log(`Server ping fout: ${error.code || 'ERROR'} - ${explainConnectionError(error)}`);
     }
     return;
   }
@@ -237,6 +247,8 @@ function start() {
     console.log('Stel eerst OWNER_USERNAME in config.json of env.example.txt in.');
     process.exit(1);
   }
+
+  log(`Start helper bots naar ${settings.host}:${settings.port} met version=${settings.version}, auth=${settings.auth}`);
 
   const maxBots = Math.min(config.safety.maxBots || 3, 3);
   config.bots.slice(0, maxBots).forEach((botConfig, index) => {
