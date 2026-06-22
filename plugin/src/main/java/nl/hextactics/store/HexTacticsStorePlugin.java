@@ -13,9 +13,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -34,10 +37,12 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
         loadSettings();
         startHttpServer();
         getLogger().info("HexTacticsStore is ingeschakeld.");
+        sendDiscordAlert("🟢 HexTacticsStore gestart", "De webshop delivery plugin is online.");
     }
 
     @Override
     public void onDisable() {
+        sendDiscordAlert("🔴 HexTacticsStore gestopt", "De webshop delivery plugin is gestopt of server restart.");
         if (server != null) {
             server.stop(0);
             server = null;
@@ -65,6 +70,7 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
             getLogger().info("HTTP API gestart op " + bind + ":" + port);
         } catch (IOException error) {
             getLogger().severe("Kon HTTP API niet starten: " + error.getMessage());
+            sendDiscordAlert("🚨 HexTacticsStore API fout", "Kon HTTP API niet starten: " + error.getMessage());
         }
     }
 
@@ -84,6 +90,7 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
 
         String token = exchange.getRequestHeaders().getFirst("X-HexTactics-Token");
         if (token == null || !token.equals(apiToken)) {
+            sendDiscordAlert("🚨 Webshop API geweigerd", "Iemand probeerde zonder juiste token `/deliver` te gebruiken.");
             sendJson(exchange, 401, "{\"ok\":false,\"error\":\"unauthorized\"}");
             return;
         }
@@ -91,8 +98,10 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
         String body = readBody(exchange);
         String player = extractJsonValue(body, "player");
         String product = extractJsonValue(body, "product");
+        String orderId = extractJsonValue(body, "orderId");
+        String price = extractJsonValue(body, "price");
 
-        DeliveryResult result = deliver(player, product, true);
+        DeliveryResult result = deliver(player, product, orderId, price, true);
         if (result.ok()) {
             sendJson(exchange, 200, "{\"ok\":true,\"message\":\"delivered\"}");
         } else {
@@ -100,7 +109,7 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
         }
     }
 
-    private DeliveryResult deliver(String player, String product, boolean async) {
+    private DeliveryResult deliver(String player, String product, String orderId, String price, boolean async) {
         if (!isValidPlayerName(player)) return new DeliveryResult(false, "invalid_player");
         if (product == null || product.isBlank()) return new DeliveryResult(false, "invalid_product");
 
@@ -121,6 +130,7 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
                 Bukkit.getPlayerExact(player).sendMessage(prefix + color(getConfig().getString("messages.delivered", "&aJe aankoop is geleverd: &e{product}").replace("{product}", productName)));
             }
             getLogger().info("Bestelling geleverd aan " + player + " product " + cleanProduct);
+            sendDiscordShopOrder(player, productName, cleanProduct, orderId, price);
         };
 
         if (async) {
@@ -149,6 +159,7 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
             loadSettings();
             startHttpServer();
             sender.sendMessage(prefix + "Config herladen en HTTP API opnieuw gestart.");
+            sendDiscordAlert("🔄 HexTacticsStore reload", "Config is herladen door " + sender.getName() + ".");
             return true;
         }
 
@@ -157,13 +168,84 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
                 sender.sendMessage(prefix + "Gebruik: /" + label + " deliver <speler> <product>");
                 return true;
             }
-            DeliveryResult result = deliver(args[1], args[2], false);
+            DeliveryResult result = deliver(args[1], args[2], "manual", "manual", false);
             sender.sendMessage(prefix + "Resultaat: " + result.message());
             return true;
         }
 
         sender.sendMessage(prefix + "Onbekend subcommando.");
         return true;
+    }
+
+    private void sendDiscordShopOrder(String player, String productName, String productKey, String orderId, String price) {
+        if (!getConfig().getBoolean("discord.enabled", true)) return;
+        String webhook = getConfig().getString("discord.shop-webhook-url", "");
+        if (!isWebhookConfigured(webhook)) return;
+
+        String json = "{"
+                + "\"username\":\"HexTactics Shop\","
+                + "\"embeds\":[{"
+                + "\"title\":\"🛒 Nieuwe aankoop geleverd\","
+                + "\"description\":\"Een webshop aankoop is succesvol geleverd.\","
+                + "\"color\":5763719,"
+                + "\"thumbnail\":{\"url\":\"https://mc-heads.net/avatar/" + escapeJson(player) + "/64\"},"
+                + "\"fields\":["
+                + "{\"name\":\"Speler\",\"value\":\"`" + escapeJson(player) + "`\",\"inline\":true},"
+                + "{\"name\":\"Product\",\"value\":\"`" + escapeJson(productName) + "`\",\"inline\":true},"
+                + "{\"name\":\"Product key\",\"value\":\"`" + escapeJson(productKey) + "`\",\"inline\":true},"
+                + "{\"name\":\"Order\",\"value\":\"`" + escapeJson(emptyFallback(orderId, "unknown")) + "`\",\"inline\":true},"
+                + "{\"name\":\"Prijs\",\"value\":\"`" + escapeJson(emptyFallback(price, "unknown")) + "`\",\"inline\":true},"
+                + "{\"name\":\"Online\",\"value\":\"`" + Bukkit.getOnlinePlayers().size() + "/" + Bukkit.getMaxPlayers() + "`\",\"inline\":true}"
+                + "],"
+                + "\"timestamp\":\"" + Instant.now() + "\""
+                + "}]}";
+        postWebhookAsync(webhook, json);
+    }
+
+    private void sendDiscordAlert(String title, String description) {
+        if (!getConfig().getBoolean("discord.enabled", true)) return;
+        String webhook = getConfig().getString("discord.alerts-webhook-url", "");
+        if (!isWebhookConfigured(webhook)) return;
+
+        String json = "{"
+                + "\"username\":\"HexTactics Alerts\","
+                + "\"embeds\":[{"
+                + "\"title\":\"" + escapeJson(title) + "\","
+                + "\"description\":\"" + escapeJson(description) + "\","
+                + "\"color\":16753920,"
+                + "\"timestamp\":\"" + Instant.now() + "\""
+                + "}]}";
+        postWebhookAsync(webhook, json);
+    }
+
+    private void postWebhookAsync(String webhook, String json) {
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                URL url = URI.create(webhook).toURL();
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                connection.setDoOutput(true);
+                try (OutputStream output = connection.getOutputStream()) {
+                    output.write(json.getBytes(StandardCharsets.UTF_8));
+                }
+                int code = connection.getResponseCode();
+                if (code < 200 || code >= 300) {
+                    getLogger().warning("Discord webhook response code: " + code);
+                }
+                connection.disconnect();
+            } catch (Exception error) {
+                getLogger().warning("Discord webhook fout: " + error.getMessage());
+            }
+        });
+    }
+
+    private boolean isWebhookConfigured(String webhook) {
+        return webhook != null && webhook.startsWith("https://") && !webhook.contains("CHANGE_THIS");
+    }
+
+    private String emptyFallback(String value, String fallback) {
+        return value == null || value.isBlank() ? fallback : value;
     }
 
     private boolean isValidPlayerName(String player) {
@@ -199,7 +281,7 @@ public final class HexTacticsStorePlugin extends JavaPlugin {
     }
 
     private String escapeJson(String input) {
-        return input == null ? "" : input.replace("\\", "\\\\").replace("\"", "\\\"");
+        return input == null ? "" : input.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n");
     }
 
     private record DeliveryResult(boolean ok, String message) {}
