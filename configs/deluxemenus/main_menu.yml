@@ -1,0 +1,50 @@
+menu_title: '&5&lHexTactics &8| &dMenu'
+open_command:
+  - menu
+  - hextactics
+size: 27
+
+items:
+  filler:
+    material: BLACK_STAINED_GLASS_PANE
+    display_name: ' '
+    slots:
+      - 0-26
+  rules:
+    material: BOOK
+    slot: 10
+    display_name: '&d&lServer Regels'
+    lore:
+      - '&7Bekijk de regels van HexTactics.'
+      - '&eKlik om te openen.'
+    left_click_commands:
+      - '[openguimenu] rules_menu'
+  rtp:
+    material: ENDER_PEARL
+    slot: 12
+    display_name: '&a&lRandom Teleport'
+    lore:
+      - '&7Ga naar een willekeurige survival plek.'
+      - '&eKlik om /rtp te gebruiken.'
+    left_click_commands:
+      - '[player] rtp'
+      - '[close]'
+  ranks:
+    material: GOLD_INGOT
+    slot: 14
+    display_name: '&6&lRanks'
+    lore:
+      - '&7Bekijk VIP, Elite en Legend.'
+      - '&eKlik om te openen.'
+    left_click_commands:
+      - '[openguimenu] ranks_menu'
+  discord:
+    material: AMETHYST_SHARD
+    slot: 16
+    display_name: '&9&lDiscord'
+    lore:
+      - '&7Join onze Discord community.'
+      - '&bdiscord.hextactics.nl'
+    left_click_commands:
+      - '[message] &5&lHexTactics &8» &7Discord: &bdiscord.hextactics.nl'
+      - '[close]'
