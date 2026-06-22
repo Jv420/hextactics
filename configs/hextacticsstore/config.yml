@@ -1,5 +1,6 @@
 # HexTacticsStore config
 # Plaats in plugins/HexTacticsStore/config.yml
+# Deze config stuurt shop, alerts, joins/leaves, deaths/stats en online status naar Discord.
 
 server:
   port: 4567
@@ -9,6 +10,19 @@ security:
   # Verander dit naar een lange geheime token.
   # Zet deze token ook in je worker environment als PLUGIN_API_TOKEN.
   api-token: "CHANGE_THIS_LONG_SECRET_TOKEN"
+
+discord:
+  enabled: true
+  # Maak webhooks in deze Discord kanalen:
+  # shop-orders, alerts, joins-leaves, player-stats, online-status
+  shop-webhook-url: "CHANGE_THIS_SHOP_ORDERS_WEBHOOK"
+  alerts-webhook-url: "CHANGE_THIS_ALERTS_WEBHOOK"
+  joins-webhook-url: "CHANGE_THIS_JOINS_LEAVES_WEBHOOK"
+  stats-webhook-url: "CHANGE_THIS_PLAYER_STATS_WEBHOOK"
+  online-webhook-url: "CHANGE_THIS_ONLINE_STATUS_WEBHOOK"
+  # Elke 15 minuten online spelers + TPS naar Discord.
+  # Zet op 0 om uit te schakelen.
+  online-status-interval-minutes: 15
 
 messages:
   prefix: "&5&lHexTactics &8» &7"
